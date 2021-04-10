@@ -399,7 +399,7 @@ namespace ToolBox
         /// Transponierte Matrix
         /// </summary>
         /// <returns>Transponierte Matrix</returns>
-        public Matrix Transpone()
+        public Matrix Transpose()
         {
             Matrix trans = new Matrix(Columns, Rows);
             for (int i = 0; i < Rows; i++)

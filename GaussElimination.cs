@@ -111,7 +111,7 @@ namespace ToolBox
             for (uint i = 0; i < rows; i++)
             {
                 rowsum = new Fraction(0);
-                for (uint j = 0; i < columns; j++)
+                for (uint j = 0; j < columns; j++)
                 {
                     rowsum += enhMat[i, j];
                 }

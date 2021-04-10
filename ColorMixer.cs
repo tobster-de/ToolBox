@@ -5,6 +5,14 @@ using System.Drawing;
 
 namespace ToolBox
 {
+
+    public enum ImageChannel
+    {
+        Red,
+        Green,
+        Blue
+    }
+
     public static class ColorMixer
     {
         /// <summary>
@@ -16,13 +24,18 @@ namespace ToolBox
         /// <returns></returns>
         public static bool Alike(this Color c1, Color c2, int delta)
         {
-            if (Math.Abs((int)(c1.R - c2.R)) > delta ||
-                Math.Abs((int)(c1.G - c2.G)) > delta ||
-                Math.Abs((int)(c1.B - c2.B)) > delta)
-            {
-                return false;
-            }
-            return true;
+            return Math.Abs(c1.R - c2.R) <= delta && Math.Abs(c1.G - c2.G) <= delta && Math.Abs(c1.B - c2.B) <= delta;
+        }
+
+        /// <summary>
+        /// Bestimmt, ob eine Farbe ähnlich einer anderen ist
+        /// </summary>
+        /// <param name="c1">Eine Farbe</param>
+        /// <param name="c2">Eine Farbe</param>
+        /// <returns>delta value</returns>
+        public static int Alike(this Color c1, Color c2)
+        {
+            return Math.Abs(c1.R - c2.R) + Math.Abs(c1.G - c2.G) + Math.Abs(c1.B - c2.B);
         }
 
         /// <summary>
@@ -32,7 +45,7 @@ namespace ToolBox
         /// <returns>Grauwert</returns>
         public static Color ConvertToGray(this Color col)
         {
-            int gray = (int)Math.Round((double)col.R * 0.299 + (double)col.G * 0.587 + (double)col.B * 0.114);
+            int gray = (int)Math.Round(col.R * 0.299 + col.G * 0.587 + col.B * 0.114);
             return Color.FromArgb(gray, gray, gray);
         }
 
@@ -72,17 +85,104 @@ namespace ToolBox
         /// <returns>Die Farbe</returns>
         public static Color FromColorName(string name)
         {
-            if (name.IndexOf("RGB") >= 0)
+            if (name.IndexOf("RGB") < 0)
             {
-                int b = name.IndexOf('(') + 1;
-                int e = name.IndexOf(')');
-                //string s = name.Substring(b, e - b);
-                string[] rgb = name.Substring(b, e - b).Split(',');
-                return Color.FromArgb(int.Parse(rgb[0]), int.Parse(rgb[1]), int.Parse(rgb[2]));
-            }
-            else
                 return Color.FromName(name);
+            }
+            int b = name.IndexOf('(') + 1;
+            int e = name.IndexOf(')');
+            //string s = name.Substring(b, e - b);
+            string[] rgb = name.Substring(b, e - b).Split(',');
+            return Color.FromArgb(int.Parse(rgb[0]), int.Parse(rgb[1]), int.Parse(rgb[2]));
         }
 
+        /// <summary>
+        /// Seperates the specified channel of the image
+        /// </summary>
+        /// <param name="image">image to retrieve the channel from</param>
+        /// <param name="channel">the channel to seperate</param>
+        /// <returns>channel of an image</returns>
+        public static Image GetImageChannel(this Image image, ImageChannel channel)
+        {
+            Bitmap bmp = new Bitmap(image);
+            Bitmap img = new Bitmap(image.Width, image.Height);
+            for (int i = 0; i < image.Width; i++)
+            {
+                for (int j = 0; j < image.Height; j++)
+                {
+                    Color color = bmp.GetPixel(i, j);
+                    int value = 0;
+                    switch (channel)
+                    {
+                        case ImageChannel.Red:
+                            color = Color.FromArgb(color.R, 0, 0);
+                            value = color.R;// - color.G - color.B;
+                            break;
+                        case ImageChannel.Green:
+                            color = Color.FromArgb(0, color.G, 0);
+                            value = color.G;// - color.R - color.B;
+                            break;
+                        case ImageChannel.Blue:
+                            color = Color.FromArgb(0, 0, color.B);
+                            value = color.B; // - color.R - color.G;
+                            break;
+                    }
+                    if (value < 0) value = 0;
+                    img.SetPixel(i, j, /*Color.FromArgb(value, value, value)*/color);
+                }
+            }
+            return img;
+        }
+
+        /// <summary>
+        /// Seperates the specified channel of the image
+        /// </summary>
+        /// <param name="image">image to retrieve the channel from</param>
+        /// <param name="compare">color to compare</param>
+        /// <returns>channel of an image</returns>
+        public static Image GetDiffImage(this Image image, Color compare)
+        {
+            Bitmap bmp = new Bitmap(image);
+            Bitmap img = new Bitmap(image.Width, image.Height);
+            for (int i = 0; i < image.Width; i++)
+            {
+                for (int j = 0; j < image.Height; j++)
+                {
+                    Color color = bmp.GetPixel(i, j);
+                    int value = 255 - (int)(color.Alike(compare) / 3.0);
+
+                    if (value < 0) value = 0;
+                    img.SetPixel(i, j, Color.FromArgb(value, value, value));
+                }
+            }
+            return img;
+        }
+
+
+
+        /// <summary>
+        /// Seperates the specified channel of the image
+        /// </summary>
+        /// <param name="image">image to retrieve the channel from</param>
+        /// <param name="compare">color to compare</param>
+        /// <returns>channel of an image</returns>
+        public static Image FilterImage(this Image image, Predicate<Color> predicate)
+        {
+            Bitmap bmp = new Bitmap(image);
+            Bitmap img = new Bitmap(image.Width, image.Height);
+            for (int i = 0; i < image.Width; i++)
+            {
+                for (int j = 0; j < image.Height; j++)
+                {
+                    Color color = bmp.GetPixel(i, j);
+                    if (!predicate(color))
+                    {
+                        color = Color.Black;
+                    }
+                    img.SetPixel(i, j, color);
+                }
+            }
+            return img;
+        }
     }
 }

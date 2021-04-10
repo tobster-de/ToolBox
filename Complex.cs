@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ToolBox
 {
-    public class Complex
+    public class Complex : IEquatable<Complex>
     {
         #region Fields
 
@@ -77,8 +77,8 @@ namespace ToolBox
         /// <param name="imag">Imaginärteil</param>
         public Complex(Fraction real, Fraction imag)
         {
-            m_Real = real;
-            m_Imaginary = imag;
+            m_Real = real != default ? real : throw new ArgumentNullException(nameof(real)); 
+            m_Imaginary = imag != default ? imag : throw new ArgumentNullException(nameof(imag));
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace ToolBox
         /// <param name="real">Realteil</param>
         public Complex(Fraction real)
         {
-            m_Real = real;
+            m_Real = real != default ? real : throw new ArgumentNullException(nameof(real));
             m_Imaginary = new Fraction(0);
         }
 
@@ -139,14 +139,23 @@ namespace ToolBox
                 throw new ArgumentOutOfRangeException("value", "Division by Zero not defined!");
             }
             return new Complex((a.Real * b.Real + a.Imaginary * b.Imaginary) / den,
-                (a.Imaginary * b.Real - a.Real * b.Imaginary) / den);
+                               (a.Imaginary * b.Real - a.Real * b.Imaginary) / den);
         }
 
-        public static Complex operator /(Complex comp, int value)
+        public static Complex operator /(Complex comp, long value)
         {
             if (value == 0)
             {
-                throw new ArgumentOutOfRangeException("value", "Division by Zero not defined!");
+                throw new ArgumentOutOfRangeException(nameof(value), "Division by Zero not defined!");
+            }
+            return new Complex(comp.Real / value, comp.Imaginary / value);
+        }
+
+        public static Complex operator /(Complex comp, Fraction value)
+        {
+            if ((long)value == 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), "Division by Zero not defined!");
             }
             return new Complex(comp.Real / value, comp.Imaginary / value);
         }
@@ -160,10 +169,15 @@ namespace ToolBox
         public static Complex operator *(Complex a, Complex b)
         {
             return new Complex(a.Real * b.Real - a.Imaginary * b.Imaginary,
-                a.Real * b.Imaginary + a.Imaginary * b.Real);
+                               a.Real * b.Imaginary + a.Imaginary * b.Real);
         }
 
         public static Complex operator *(Complex comp, int value)
+        {
+            return new Complex(comp.Real * value, comp.Imaginary * value);
+        }
+
+        public static Complex operator *(Complex comp, Fraction value)
         {
             return new Complex(comp.Real * value, comp.Imaginary * value);
         }
@@ -184,6 +198,11 @@ namespace ToolBox
             return new Complex(comp.Real + value, comp.Imaginary);
         }
 
+        public static Complex operator +(Complex comp, Fraction value)
+        {
+            return new Complex(comp.Real + value, comp.Imaginary);
+        }
+
         /// <summary>
         /// Subtrahieren
         /// </summary>
@@ -196,6 +215,11 @@ namespace ToolBox
         }
 
         public static Complex operator -(Complex comp, int value)
+        {
+            return new Complex(comp.Real - value, comp.Imaginary);
+        }
+
+        public static Complex operator -(Complex comp, Fraction value)
         {
             return new Complex(comp.Real - value, comp.Imaginary);
         }
@@ -223,27 +247,13 @@ namespace ToolBox
         public static Fraction Abs(Complex comp)
         {
             //TODO: Wurzel eines Bruches implementieren
-            double abs = Math.Sqrt((comp.Real * comp.Real) + (comp.Imaginary * comp.Imaginary));
+            double abs = Math.Sqrt((comp.Real * comp.Real).Value + (comp.Imaginary * comp.Imaginary).Value);
             return new Fraction(abs);
         }
+        
         #endregion
 
         #region Overrides
-
-        /// <summary>
-        /// Vergleich
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override bool Equals(object obj)
-        {
-            if (obj is Complex)
-            {
-                Complex other = obj as Complex;
-                return (other.Real.Equals(m_Real) && other.Imaginary.Equals(m_Imaginary));
-            }
-            return false;
-        }
 
         public override string ToString()
         {
@@ -294,12 +304,49 @@ namespace ToolBox
 
         }
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
         #endregion
 
+        public bool Equals(Complex other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return Equals(this.m_Real, other.m_Real) && Equals(this.m_Imaginary, other.m_Imaginary);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+
+            return Equals((Complex) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return ((this.m_Real != null ? this.m_Real.GetHashCode() : 0) * 397) ^ (this.m_Imaginary != null ? this.m_Imaginary.GetHashCode() : 0);
+            }
+        }
     }
 }

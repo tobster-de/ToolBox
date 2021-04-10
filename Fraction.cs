@@ -7,12 +7,9 @@ namespace ToolBox
     /// <summary>
     /// Bruch
     /// </summary>
-    public class Fraction
+    public struct Fraction : IEquatable<Fraction>, ICloneable
     {
         #region Fields
-
-        private int m_Numerator;                // Zähler
-        private int m_Denominator;              // Nenner
 
         #endregion
 
@@ -21,83 +18,57 @@ namespace ToolBox
         /// <summary>
         /// Zähler
         /// </summary>
-        public int Numerator
-        {
-            get
-            {
-                return m_Numerator;
-            }
-            //set
-            //{
-            //    m_Numerator = value;
-            //    CancelDown();
-            //}
-        }
+        public long Numerator { get; private set; }
 
         /// <summary>
         /// Nenner
         /// </summary>
-        public int Denominator
-        {
-            get
-            {
-                return m_Denominator;
-            }
-            //set
-            //{
-            //    if (value == 0)
-            //    {
-            //        throw new ArgumentOutOfRangeException("denominator", "Denominator must not be zero!");
-            //    }
-            //    m_Denominator = value;
-            //    CancelDown();
-            //}
-        }
+        public long Denominator { get; private set; }
 
         /// <summary>
-        /// Gebrochener Wert des Bruchs
+        /// Value of the fraction as double
         /// </summary>
-        public double Value
-        {
-            get
-            {
-                return (double)m_Numerator / (double)m_Denominator;
-            }
-        }
-
+        public double Value => (double)this.Numerator / (double)this.Denominator;
 
         #endregion
 
         #region Construction
 
-        public Fraction(int numerator, int denominator)
+        public Fraction(string strValue)
+        {
+            Fraction temp = Parse(strValue);
+            this.Numerator = temp.Numerator;
+            this.Denominator = temp.Denominator;
+        }
+
+        public Fraction(long numerator, long denominator)
         {
             if (denominator == 0)
             {
-                throw new ArgumentOutOfRangeException("denominator", "Denominator must not be zero!");
+                throw new ArgumentOutOfRangeException(nameof(denominator), "Denominator must not be zero!");
             }
-            m_Numerator = numerator;
-            m_Denominator = denominator;
-            CancelDown();
+            this.Numerator = numerator;
+            this.Denominator = denominator;
+            this.Reduce();
         }
 
-        public Fraction(int value)
+        public Fraction(long value)
         {
-            m_Numerator = value;
-            m_Denominator = 1;
+            this.Numerator = value;
+            this.Denominator = 1;
         }
 
         public Fraction(double value)
         {
             Fraction dummy = MakeRational(value);
-            m_Numerator = dummy.Numerator;
-            m_Denominator = dummy.Denominator;
+            this.Numerator = dummy.Numerator;
+            this.Denominator = dummy.Denominator;
         }
 
         public Fraction(Fraction original)
         {
-            m_Numerator = original.m_Numerator;
-            m_Denominator = original.m_Denominator;
+            this.Numerator = original.Numerator;
+            this.Denominator = original.Denominator;
         }
 
         #endregion
@@ -110,9 +81,9 @@ namespace ToolBox
         /// <param name="value1">Wert 1</param>
         /// <param name="value2">Wert 1</param>
         /// <returns></returns>
-        private int FindHighestCommonFactor(int value1, int value2)
+        private long GreatestCommonDivider(long value1, long value2)
         {
-            int r;
+            long r;
             // Euklidscher Algorithmus
             value1 = Math.Abs(value1);
             value2 = Math.Abs(value2);
@@ -134,23 +105,23 @@ namespace ToolBox
         /// <summary>
         /// Kürzt den Bruch
         /// </summary>
-        private void CancelDown()
+        private void Reduce()
         {
-            int factor = FindHighestCommonFactor(m_Numerator, m_Denominator);
+            long factor = this.GreatestCommonDivider(this.Numerator, this.Denominator);
             if (factor != 0)
             {
-                m_Numerator = m_Numerator / factor;
-                m_Denominator = m_Denominator / factor;
+                this.Numerator /= factor;
+                this.Denominator /= factor;
             }
-            if (m_Denominator < 0)
+            if (this.Denominator < 0)
             {
-                m_Numerator = m_Numerator * -1;
-                m_Denominator = m_Denominator * -1;
+                this.Numerator *= -1;
+                this.Denominator *= -1;
             }
-            else if (m_Denominator == 0)
+            else if (this.Denominator == 0)
             {
-                m_Numerator = 0;
-                m_Denominator = 1;
+                this.Numerator = 0;
+                this.Denominator = 1;
             }
         }
 
@@ -161,15 +132,15 @@ namespace ToolBox
         /// <summary>
         /// Gibt Absolutwert wieder
         /// </summary>
-        /// <param name="frac">Bruch</param>
+        /// <param name="fraction">Bruch</param>
         /// <returns>Absolutwert</returns>
-        public static Fraction Abs(Fraction frac)
+        public static Fraction Abs(Fraction fraction)
         {
-            Fraction result = new Fraction(frac);
-            result.CancelDown();
+            Fraction result = new Fraction(fraction);
+            result.Reduce();
             if (result.Numerator < 0)
             {
-                result.m_Numerator *= -1;
+                result.Numerator *= -1;
             }
             return result;
         }
@@ -177,19 +148,16 @@ namespace ToolBox
         /// <summary>
         /// Kehrwert
         /// </summary>
-        /// <returns></returns>
-        public Fraction Reciprocal()
+        public Fraction Inverse()
         {
             return new Fraction(Denominator, Numerator);
         }
 
         public static Fraction MakeRational(double x, double eps)
         {
-            bool negative = false;
-            Fraction result = null;
-            if (x < 0)
+            bool negative = x < 0;
+            if (negative)
             {
-                negative = true;
                 x = -x;
             }
             if (x < eps)
@@ -198,38 +166,81 @@ namespace ToolBox
             }
             if (x > 1)
             {
-                result = MakeRational(x - Math.Floor(x), eps) + (int)Math.Floor(x);
+                Fraction result1 = MakeRational(x - Math.Floor(x), eps) + (long)Math.Floor(x);
                 if (negative)
                 {
-                    result = -result;
+                    result1 = -result1;
                 }
-                return result;
+                return result1;
             }
+
             double invR = 1 / x;
-            int inv = (int)Math.Floor(invR);
+            long inv = (long)Math.Floor(invR);
             double rest = invR - inv;
             double n_eps = inv * eps;
             if (n_eps > 1 || rest <= (n_eps * inv) / (1 - n_eps)
                 || rest >= (1 - n_eps * (inv + 1)) / (1 + eps * (inv + 1)))
             {
-                result = new Fraction(1, (2 * rest > 1 ? inv + 1 : inv));
+                Fraction result2 = new Fraction(1, (2 * rest > 1 ? inv + 1 : inv));
                 if (negative)
                 {
-                    result = -result;
+                    result2 = -result2;
                 }
-                return result;
+                return result2;
             }
-            result = (new Fraction(1) / (MakeRational(rest, 2 * eps * invR) + inv));
+
+            Fraction result3 = (new Fraction(1) / (MakeRational(rest, 2 * eps * invR) + inv));
             if (negative)
             {
-                result = -result;
+                result3 = -result3;
             }
-            return result;
+            return result3;
         }
 
         public static Fraction MakeRational(double x)
         {
             return MakeRational(x, 1e-13);
+        }
+
+        /// <summary>
+        /// The function takes an string as an argument and returns its corresponding reduced fraction
+        /// the string can be an in the form of and integer, double or fraction.
+        /// e.g it can be like "123" or "123.321" or "123/456"
+        /// </summary>
+        public static Fraction Parse(string strValue)
+        {
+            if (TryParse(strValue, out Fraction fraction))
+            {
+                return fraction;
+            }
+
+            throw new ArgumentException("Cannot convert the provided string value.", nameof(strValue));
+        }
+
+        public static bool TryParse(string strValue, out Fraction fraction)
+        {
+            if (string.IsNullOrWhiteSpace(strValue))
+            {
+                fraction = new Fraction(0, 1);
+                return false;
+            }
+
+            int i = strValue.IndexOf('/');
+            if (i == -1)
+            {
+                // if string is not in the form of a fraction
+                // then it is double or integer
+
+                fraction = MakeRational(Convert.ToDouble(strValue));
+                return true;
+            }
+
+            // string is in the form of Numerator/Denominator
+            long numerator = Convert.ToInt64(strValue.Substring(0, i));
+            long denominator = Convert.ToInt64(strValue.Substring(i + 1));
+            fraction = new Fraction(numerator, denominator);
+
+            return true;
         }
 
         #endregion
@@ -242,24 +253,22 @@ namespace ToolBox
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static Fraction operator /(Fraction a, Fraction b)
-        {
-            return new Fraction(a.Numerator * b.Denominator, a.Denominator * b.Numerator);
-        }
+        public static Fraction operator /(Fraction a, Fraction b) 
+            => new Fraction(a.Numerator * b.Denominator, 
+                            a.Denominator * b.Numerator);
 
-        public static Fraction operator /(Fraction frac, int value)
+        public static Fraction operator /(Fraction fraction, long value)
         {
             if (value == 0)
             {
-                throw new ArgumentOutOfRangeException("value", "Division by Zero not defined!");
+                throw new ArgumentOutOfRangeException(nameof(value), "Division by Zero not defined!");
             }
-            return new Fraction(frac.Numerator, frac.Denominator * value);
+            
+            return new Fraction(fraction.Numerator, fraction.Denominator * value);
         }
 
-        public static Fraction operator /(int value, Fraction frac)
-        {
-            return value * frac.Reciprocal();
-        }
+        public static Fraction operator /(long value, Fraction fraction) 
+            => value * fraction.Inverse();
 
         /// <summary>
         /// Multiplizieren
@@ -272,36 +281,36 @@ namespace ToolBox
             return new Fraction(a.Numerator * b.Numerator, a.Denominator * b.Denominator);
         }
 
-        public static Fraction operator *(Fraction frac, int value)
+        public static Fraction operator *(Fraction fraction, long value)
         {
-            return new Fraction(frac.Numerator * value, frac.Denominator);
+            return new Fraction(fraction.Numerator * value, fraction.Denominator);
         }
 
-        public static Fraction operator *(int value, Fraction frac)
+        public static Fraction operator *(long value, Fraction fraction)
         {
-            return new Fraction(frac.Numerator * value, frac.Denominator);
+            return new Fraction(fraction.Numerator * value, fraction.Denominator);
         }
 
         /// <summary>
-        /// Addieren
+        /// Add fractions
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static Fraction operator +(Fraction a, Fraction b)
-        {
-            return new Fraction(a.Numerator * b.Denominator + b.Numerator * a.Denominator, a.Denominator * b.Denominator);
-        }
+            => new Fraction(a.Numerator * b.Denominator + b.Numerator * a.Denominator,
+                            a.Denominator * b.Denominator);
 
-        public static Fraction operator +(Fraction frac, int value)
-        {
-            return new Fraction(frac.Numerator + value * frac.Denominator, frac.Denominator);
-        }
+        /// <summary>
+        /// Add a whole number to a fraction
+        /// </summary>
+        public static Fraction operator +(Fraction fraction, long value)
+            => new Fraction(fraction.Numerator + value * fraction.Denominator,
+                            fraction.Denominator);
 
-        public static Fraction operator +(int value, Fraction frac)
-        {
-            return new Fraction(frac.Numerator + value * frac.Denominator, frac.Denominator);
-        }
+        /// <summary>
+        /// Add a whole number to a fraction
+        /// </summary>
+        public static Fraction operator +(long value, Fraction fraction)
+            => new Fraction(fraction.Numerator + value * fraction.Denominator,
+                            fraction.Denominator);
 
         /// <summary>
         /// Subtrahieren
@@ -310,38 +319,75 @@ namespace ToolBox
         /// <param name="b"></param>
         /// <returns></returns>
         public static Fraction operator -(Fraction a, Fraction b)
-        {
-            return new Fraction(a.Numerator * b.Denominator - b.Numerator * a.Denominator, a.Denominator * b.Denominator);
-        }
+            => new Fraction(a.Numerator * b.Denominator - b.Numerator * a.Denominator,
+                            a.Denominator * b.Denominator);
 
-        public static Fraction operator -(Fraction frac, int value)
-        {
-            return new Fraction(frac.Numerator - value * frac.Denominator, frac.Denominator);
-        }
+        public static Fraction operator -(Fraction fraction, long value)
+            => new Fraction(fraction.Numerator - value * fraction.Denominator,
+                            fraction.Denominator);
 
-        public static Fraction operator -(int value, Fraction frac)
-        {
-            return new Fraction(value) - frac;
-        }
+        public static Fraction operator -(long value, Fraction fraction)
+            => new Fraction(value) - fraction;
 
         /// <summary>
         /// Negierung
         /// </summary>
-        /// <param name="frac"></param>
+        /// <param name="fraction"></param>
         /// <returns></returns>
-        public static Fraction operator -(Fraction frac)
+        public static Fraction operator -(Fraction fraction)
+            => new Fraction(-fraction.Numerator, fraction.Denominator);
+
+        public static bool operator ==(Fraction frac1, Fraction frac2)
+            => Equals(frac1, frac2);
+
+        public static bool operator !=(Fraction frac1, Fraction frac2)
+            => (!Equals(frac1, frac2));
+        public static bool operator <(Fraction frac1, Fraction frac2)
+            => frac1.Numerator * frac2.Denominator < frac2.Numerator * frac1.Denominator;
+
+        public static bool operator >(Fraction frac1, Fraction frac2)
+            => frac1.Numerator * frac2.Denominator > frac2.Numerator * frac1.Denominator;
+
+        public static bool operator <=(Fraction frac1, Fraction frac2)
+            => frac1.Numerator * frac2.Denominator <= frac2.Numerator * frac1.Denominator;
+        public static bool operator >=(Fraction frac1, Fraction frac2)
+            => frac1.Numerator * frac2.Denominator >= frac2.Numerator * frac1.Denominator;
+
+        /// <summary>
+        /// Convert from fraction to double
+        /// </summary>
+        public static explicit operator double(Fraction fraction)
         {
-            return new Fraction(-frac.Numerator, frac.Denominator);
+            return fraction.Value;
         }
 
         /// <summary>
-        /// Implizite Konvertierung in Gleitkommawert
+        /// Convert from fraction to string
         /// </summary>
-        /// <param name="frac"></param>
-        /// <returns></returns>
-        public static implicit operator double(Fraction frac)
+        public static explicit operator string(Fraction fraction)
         {
-            return frac.Value;
+            return fraction.ToString();
+        }
+
+        /// <summary>
+        /// Convert from numeric data type long to fraction
+        /// </summary>
+        public static implicit operator Fraction(long value)
+        {
+            return new Fraction(value);
+        }
+
+        /// <summary>
+        /// Convert from numeric data type long to fraction
+        /// </summary>
+        public static implicit operator Fraction(double value)
+        {
+            return new Fraction(value);
+        }
+
+        public static explicit operator Fraction(string value)
+        {
+            return new Fraction(value);
         }
 
         #endregion
@@ -350,30 +396,15 @@ namespace ToolBox
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            unchecked
+            {
+                return (this.Numerator.GetHashCode() * 397) ^ this.Denominator.GetHashCode();
+            }
         }
 
-        /// <summary>
-        /// Vergleich
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public override bool Equals(object obj)
+        public object Clone()
         {
-            if (obj is Fraction)
-            {
-                CancelDown();
-                Fraction other = new Fraction(obj as Fraction);
-                other.CancelDown();
-                return (other.Numerator == m_Numerator && other.Denominator == m_Denominator);
-            }
-            if (obj is int)
-            {
-                CancelDown();
-                int other = (int)obj;
-                return (other == m_Numerator && 1 == m_Denominator);
-            }
-            return false;
+            return new Fraction(this);
         }
 
         /// <summary>
@@ -382,17 +413,30 @@ namespace ToolBox
         /// <returns></returns>
         public override string ToString()
         {
-            if (m_Denominator > 1 || m_Denominator < -1)
+            if (this.Denominator > 1 || this.Denominator < -1)
             {
-                return String.Format("{0}/{1}", m_Numerator, m_Denominator);
+                return $"{this.Numerator}/{this.Denominator}";
             }
-            else
-            {
-                return m_Numerator.ToString();
-            }
+
+            return this.Numerator.ToString();
         }
 
         #endregion
+
+        #region Equality
+
+        public bool Equals(Fraction other)
+        {
+            return this.Numerator == other.Numerator && this.Denominator == other.Denominator;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Fraction other && Equals(other);
+        }
+
+        #endregion
+
     }
 
 }

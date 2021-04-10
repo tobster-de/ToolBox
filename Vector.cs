@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.ComponentModel;
+using System.Xml.Serialization;
+using System.Globalization;
 
 namespace ToolBox
 {
     /// <summary>
     /// Mathematischer Vektor
     /// </summary>
+    [Serializable]
     public class Vector
     {
         /// <summary>
@@ -67,7 +71,37 @@ namespace ToolBox
             }
         }
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [XmlElement(ElementName = "Components")]
+        public double[] Components
+        {
+            get
+            {
+                return m_cmps;
+            }
+            set
+            {
+                /*if (value.Count > m_cmps.Length) {
+                    //double[] copy = double[m_cmps.Length];
+                    //for (int i= 0; i < m_cmps.Length; i++) 
+                    //    copy[i] = m_cmps[i];
+                    m_cmps = new double[value.Count];
+                }
+                for (int i = 0; i < value.Count; i++) m_cmps[i] = value[i];*/
+                m_cmps = value;
+            }
+        }
+
         #region Construction
+
+        /// <summary>
+        /// Deserialisation
+        /// </summary>
+        public Vector() {
+            m_cmps = new double[2];
+            m_cmps[0] = 0;
+            m_cmps[1] = 0;
+        }
 
         /// <summary>
         /// Vektor für dreidimensionalen Vektor
@@ -105,6 +139,15 @@ namespace ToolBox
         }
 
         /// <summary>
+        /// Konstruktor für mehrdimensionalen Vektor
+        /// </summary>
+        /// <param name="components">Komponenten</param>
+        public Vector(params double[] components)
+        {
+            m_cmps = components;
+        }
+
+        /// <summary>
         /// Kopierkonstruktor
         /// </summary>
         /// <param name="other">Original</param>
@@ -131,7 +174,7 @@ namespace ToolBox
         {
             if (v1.Dimensions != v2.Dimensions)
             {
-                throw new ArgumentException("Dimionsions of Vectors do not match.");
+                throw new ArgumentException("Dimensions of Vectors do not match.");
             }
             Vector vector = new Vector(v1);
             for (int i = 0; i < vector.Dimensions; i++)
@@ -151,7 +194,7 @@ namespace ToolBox
         {
             if (v1.Dimensions != v2.Dimensions)
             {
-                throw new ArgumentException("Dimionsions of Vectors do not match.");
+                throw new ArgumentException("Dimensions of Vectors do not match.");
             }
             Vector vector = new Vector(v1);
             for (int i = 0; i < vector.Dimensions; i++)
@@ -171,7 +214,7 @@ namespace ToolBox
         {
             if (v1.Dimensions != v2.Dimensions)
             {
-                throw new ArgumentException("Dimionsions of Vectors do not match.");
+                throw new ArgumentException("Dimensions of Vectors do not match.");
             }
             double result = 0;
             for (int i = 0; i < v1.Dimensions; i++)
@@ -259,13 +302,16 @@ namespace ToolBox
 
         public override string ToString()
         {
+            //string str = "";
             string str = "Vector: (";
+            NumberFormatInfo nfi = new NumberFormatInfo();
+            nfi.CurrencyDecimalSeparator = ".";
             for (int i = 0; i < Dimensions; i++)
             {
-                str += m_cmps[i];
+                str += String.Format(nfi,"{0:0.##}",m_cmps[i]);
                 if (i < Dimensions - 1)
                 {
-                    str += ";";
+                    str += ",";
                 }
             }
             str += ")";
@@ -342,6 +388,20 @@ namespace ToolBox
                 throw new NotSupportedException("Conversion to PointF only supported for Vector with two components.");
             }
             return new System.Drawing.PointF((float)m_cmps[0], (float)m_cmps[1]);
+        }
+
+        /// <summary>
+        /// Abstand zu anderem Vector bestimmen
+        /// </summary>
+        /// <param name="other">Anderer Vektor</param>
+        /// <returns>Abstand zu anderm Vektor</returns>
+        public double Distance(Vector other)
+        {
+            if (this.Dimensions != other.Dimensions)
+            {
+                throw new ArgumentException("Dimensions of Vectors do not match.");
+            }
+            return (this - other).Length;
         }
 
         #endregion

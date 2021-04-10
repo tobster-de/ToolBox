@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9C3F1A71-69A8-46C1-99F9-A34FCF65348C}"
+	ProjectSection(SolutionItems) = preProject
+		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
+		ToolBox.vsmdi = ToolBox.vsmdi
+		ToolBox1.vsmdi = ToolBox1.vsmdi
+		ToolBox2.vsmdi = ToolBox2.vsmdi
+		ToolBox3.vsmdi = ToolBox3.vsmdi
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToolBox", "ToolBox.csproj", "{A928AC84-38CA-488B-BF58-2CF29B0CB2CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "TestProject\TestProject.csproj", "{AECBC234-C542-4BA2-BBE8-923FA7BBC166}"
+EndProject
+Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = ToolBox3.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A928AC84-38CA-488B-BF58-2CF29B0CB2CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A928AC84-38CA-488B-BF58-2CF29B0CB2CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A928AC84-38CA-488B-BF58-2CF29B0CB2CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A928AC84-38CA-488B-BF58-2CF29B0CB2CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AECBC234-C542-4BA2-BBE8-923FA7BBC166}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AECBC234-C542-4BA2-BBE8-923FA7BBC166}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AECBC234-C542-4BA2-BBE8-923FA7BBC166}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AECBC234-C542-4BA2-BBE8-923FA7BBC166}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

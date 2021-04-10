@@ -12,30 +12,23 @@ namespace ToolBox
         /// <summary>
         /// Komponenten
         /// </summary>
-        private Fraction[][] m_cmps;
+        private readonly Fraction[][] _components;
 
         /// <summary>
         /// Anzahl der Zeilen
         /// </summary>
-        public uint Rows
-        {
-            get
-            {
-                return (uint)m_cmps.Length;
-            }
-        }
-        public uint Columns
-        {
-            get
-            {
-                return (uint)m_cmps[0].Length;
-            }
-        }
+        public uint Rows => (uint)this._components.Length;
+        
+        /// <summary>
+        /// Anzahl der Spalten
+        /// </summary>
+        public uint Columns => (uint)this._components[0].Length;
 
         /// <summary>
         /// Zugriff auf Komponenten des Vektors
         /// </summary>
-        /// <param name="index"></param>
+        /// <param name="indexX"></param>
+        /// <param name="indexY"></param>
         /// <returns></returns>
         public Fraction this[uint indexX, uint indexY]
         {
@@ -43,7 +36,7 @@ namespace ToolBox
             {
                 if (indexX < Rows && indexY < Columns)
                 {
-                    return m_cmps[indexX][indexY];
+                    return this._components[indexX][indexY];
                 }
                 throw new IndexOutOfRangeException();
             }
@@ -51,7 +44,7 @@ namespace ToolBox
             {
                 if (indexX < Rows && indexY < Columns)
                 {
-                    m_cmps[indexX][indexY] = value;
+                    this._components[indexX][indexY] = value;
                     return;
                 }
                 throw new IndexOutOfRangeException();
@@ -61,13 +54,7 @@ namespace ToolBox
         /// <summary>
         /// Determinante
         /// </summary>
-        public Fraction Determinant
-        {
-            get
-            {
-                return MatrixEx.CalcDeterminant(this);
-            }
-        }
+        public Fraction Determinant => MatrixEx.CalcDeterminant(this);
 
         #region Construction
 
@@ -78,10 +65,10 @@ namespace ToolBox
         /// <param name="columns">Anzahl Spalten</param>
         public MatrixEx(uint rows, uint columns)
         {
-            m_cmps = new Fraction[rows][];
+            this._components = new Fraction[rows][];
             for (int i = 0; i < rows; i++)
             {
-                m_cmps[i] = new Fraction[columns];
+                this._components[i] = new Fraction[columns];
             }
         }
 
@@ -91,13 +78,13 @@ namespace ToolBox
         /// <param name="other">Original</param>
         internal MatrixEx(MatrixEx other)
         {
-            m_cmps = new Fraction[other.Rows][];
+            this._components = new Fraction[other.Rows][];
             for (int i = 0; i < other.Rows; i++)
             {
-                m_cmps[i] = new Fraction[other.Columns];
+                this._components[i] = new Fraction[other.Columns];
                 for (int j = 0; j < other.Columns; j++)
                 {
-                    m_cmps[i][j] = new Fraction(other.m_cmps[i][j]);
+                    this._components[i][j] = new Fraction(other._components[i][j]);
                 }
             }
         }
@@ -124,7 +111,7 @@ namespace ToolBox
             {
                 for (int j = 0; j < matrix.Columns; j++)
                 {
-                    matrix.m_cmps[i][j] += m2.m_cmps[i][j];
+                    matrix._components[i][j] += m2._components[i][j];
                 }
             }
             return matrix;
@@ -148,7 +135,7 @@ namespace ToolBox
             {
                 for (int j = 0; j < matrix.Columns; j++)
                 {
-                    matrix.m_cmps[i][j] -= m2.m_cmps[i][j];
+                    matrix._components[i][j] -= m2._components[i][j];
                 }
             }
             return matrix;
@@ -176,7 +163,7 @@ namespace ToolBox
                     {
                         sum += m1[i, k] * m2[k, j];
                     }
-                    matrix.m_cmps[i][j] = sum;
+                    matrix._components[i][j] = sum;
                 }
             }
             return matrix;
@@ -196,7 +183,7 @@ namespace ToolBox
             {
                 for (int j = 0; j < matrix.Columns; j++)
                 {
-                    matrix.m_cmps[i][j] *= skalar;
+                    matrix._components[i][j] *= skalar;
                 }
             }
             return matrix;
@@ -226,7 +213,7 @@ namespace ToolBox
             {
                 for (int j = 0; j < matrix.Columns; j++)
                 {
-                    matrix.m_cmps[i][j] /= skalar;
+                    matrix._components[i][j] /= skalar;
                 }
             }
             return matrix;
@@ -234,12 +221,12 @@ namespace ToolBox
 
         public static bool operator ==(MatrixEx v1, MatrixEx v2)
         {
-            return v1.Equals(v2);
+            return Equals(v1, v2);
         }
 
         public static bool operator !=(MatrixEx v1, MatrixEx v2)
         {
-            return !v1.Equals(v2);
+            return !Equals(v1, v2);
         }
 
         #endregion
@@ -263,7 +250,7 @@ namespace ToolBox
             {
                 for (int j = 0; j < oMatrix.Columns; j++)
                 {
-                    equal &= m_cmps[i][j] == oMatrix.m_cmps[i][j];
+                    equal &= this._components[i][j] == oMatrix._components[i][j];
                 }
             }
             return equal;
@@ -276,7 +263,7 @@ namespace ToolBox
             {
                 for (int j = 0; j < Columns; j++)
                 {
-                    str += m_cmps[i][j].ToString();
+                    str += this._components[i][j].ToString();
                     if (j < Columns - 1)
                     {
                         str += ",";
@@ -305,7 +292,7 @@ namespace ToolBox
         /// </summary>
         /// <param name="count">Anzahl Zeilen und Spalten</param>
         /// <returns></returns>
-        static public Matrix Unity(uint count)
+        public static Matrix Unity(uint count)
         {
             Matrix matrix = new Matrix(count, count);
             for (uint i = 0; i < count; i++)
@@ -330,7 +317,7 @@ namespace ToolBox
             {
                 for (int j = 0; j < Columns; j++)
                 {
-                    trans.m_cmps[j][i] = m_cmps[i][j];
+                    trans._components[j][i] = this._components[i][j];
                 }
             }
             return trans;
