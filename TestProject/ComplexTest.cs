@@ -286,12 +286,12 @@ namespace TestProject
         /// A test for Conjugation
         /// </summary>
         [TestMethod]
-        public void ConjugationTest()
+        public void ConjugateTest()
         {
             Complex comp = new Complex(4, 6);
             Complex expected = new Complex(4, -6);
 
-            Assert.AreEqual(expected, comp.Conjugation);
+            Assert.AreEqual(expected, comp.Conjugate);
         }
 
         /// <summary>

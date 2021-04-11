@@ -7,44 +7,34 @@ namespace ToolBox.Algebra
         #region Properties
 
         /// <summary>
-        /// Realteil
+        /// Real value
         /// </summary>
         public Fraction Real { get; }
 
         /// <summary>
-        /// Imaginärteil
+        /// Imaginary value
         /// </summary>
         public Fraction Imaginary { get; }
 
         /// <summary>
-        /// Gibt Absolutwert wieder
+        /// Returns the absolute value of the complex number.
         /// </summary>
-        /// <returns>Absolutwert</returns>
-        /// <remarks>Verlust der Präzision, </remarks>
-        public Fraction Absolute
-        {
-            get
-            {
-                //TODO: Wurzel eines Bruches implementieren
-                double abs = Math.Sqrt((this.Real * this.Real).Value + (this.Imaginary * this.Imaginary).Value);
-                return new Fraction(abs);
-            }
-        }
+        public Fraction Absolute => (this.Real * this.Real + this.Imaginary * this.Imaginary).Sqrt();
 
         /// <summary>
-        /// Konjugiert komplexe Zahl
+        /// Returns the complex conjugate of this complex number.
         /// </summary>
-        public Complex Conjugation => new Complex(this.Real, -this.Imaginary);
+        public Complex Conjugate => new Complex(this.Real, -this.Imaginary);
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Konstruktor mit Integer
+        /// Constructor with integer components
         /// </summary>
-        /// <param name="real">Realteil</param>
-        /// <param name="imag">Imaginärteil</param>
+        /// <param name="real">Real part</param>
+        /// <param name="imag">Imaginary part</param>
         public Complex(int real, int imag)
         {
             this.Real = new Fraction(real);
@@ -52,10 +42,10 @@ namespace ToolBox.Algebra
         }
 
         /// <summary>
-        /// Konstruktor mit Double
+        /// Constructor with floating point components
         /// </summary>
-        /// <param name="real">Realteil</param>
-        /// <param name="imag">Imaginärteil</param>
+        /// <param name="real">Real part</param>
+        /// <param name="imag">Imaginary part</param>
         public Complex(double real, double imag)
         {
             this.Real = new Fraction(real);
@@ -63,20 +53,20 @@ namespace ToolBox.Algebra
         }
 
         /// <summary>
-        /// Konstruktor mit Brüchen
+        /// Constructor with fraction components
         /// </summary>
-        /// <param name="real">Realteil</param>
-        /// <param name="imag">Imaginärteil</param>
+        /// <param name="real">Real part</param>
+        /// <param name="imag">Imaginary part</param>
         public Complex(Fraction real, Fraction imag)
         {
-            this.Real = real != default ? real : throw new ArgumentNullException(nameof(real)); 
+            this.Real = real != default ? real : throw new ArgumentNullException(nameof(real));
             this.Imaginary = imag != default ? imag : throw new ArgumentNullException(nameof(imag));
         }
 
         /// <summary>
-        /// Konstruktor mit Integer
+        /// Constructor with integer real part
         /// </summary>
-        /// <param name="real">Realteil</param>
+        /// <param name="real">Real part</param>
         public Complex(int real)
         {
             this.Real = new Fraction(real);
@@ -84,9 +74,9 @@ namespace ToolBox.Algebra
         }
 
         /// <summary>
-        /// Konstruktor mit Double
+        /// Constructor with floating point real part
         /// </summary>
-        /// <param name="real">Realteil</param>
+        /// <param name="real">Real part</param>
         public Complex(double real)
         {
             this.Real = new Fraction(real);
@@ -94,9 +84,9 @@ namespace ToolBox.Algebra
         }
 
         /// <summary>
-        /// Konstruktor
+        /// Constructor with a fraction real part
         /// </summary>
-        /// <param name="real">Realteil</param>
+        /// <param name="real">Real part</param>
         public Complex(Fraction real)
         {
             this.Real = real != default ? real : throw new ArgumentNullException(nameof(real));
@@ -104,9 +94,9 @@ namespace ToolBox.Algebra
         }
 
         /// <summary>
-        /// Kopierkonstruktor
+        /// Copying Constructor
         /// </summary>
-        /// <param name="original">Originalobjekt</param>
+        /// <param name="original">Original object</param>
         public Complex(Complex original)
         {
             this.Real = new Fraction(original.Real);
@@ -118,11 +108,8 @@ namespace ToolBox.Algebra
         #region Operators
 
         /// <summary>
-        /// Dividieren
+        /// Divide
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static Complex operator /(Complex a, Complex b)
         {
             Fraction den = (b.Real * b.Real + b.Imaginary * b.Imaginary);
@@ -134,6 +121,9 @@ namespace ToolBox.Algebra
                                (a.Imaginary * b.Real - a.Real * b.Imaginary) / den);
         }
 
+        /// <summary>
+        /// Divide
+        /// </summary>
         public static Complex operator /(Complex comp, long value)
         {
             if (value == 0)
@@ -143,6 +133,9 @@ namespace ToolBox.Algebra
             return new Complex(comp.Real / value, comp.Imaginary / value);
         }
 
+        /// <summary>
+        /// Divide
+        /// </summary>
         public static Complex operator /(Complex comp, Fraction value)
         {
             if ((long)value == 0)
@@ -153,64 +146,73 @@ namespace ToolBox.Algebra
         }
 
         /// <summary>
-        /// Multiplizieren
+        /// Multiply
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static Complex operator *(Complex a, Complex b)
         {
             return new Complex(a.Real * b.Real - a.Imaginary * b.Imaginary,
                                a.Real * b.Imaginary + a.Imaginary * b.Real);
         }
 
+        /// <summary>
+        /// Multiply
+        /// </summary>
         public static Complex operator *(Complex comp, int value)
         {
             return new Complex(comp.Real * value, comp.Imaginary * value);
         }
 
+        /// <summary>
+        /// Multiply
+        /// </summary>
         public static Complex operator *(Complex comp, Fraction value)
         {
             return new Complex(comp.Real * value, comp.Imaginary * value);
         }
 
         /// <summary>
-        /// Addieren
+        /// Add
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static Complex operator +(Complex a, Complex b)
         {
             return new Complex(a.Real + b.Real, a.Imaginary + b.Imaginary);
         }
 
+        /// <summary>
+        /// Add
+        /// </summary>
         public static Complex operator +(Complex comp, int value)
         {
             return new Complex(comp.Real + value, comp.Imaginary);
         }
 
+        /// <summary>
+        /// Add
+        /// </summary>
         public static Complex operator +(Complex comp, Fraction value)
         {
             return new Complex(comp.Real + value, comp.Imaginary);
         }
 
         /// <summary>
-        /// Subtrahieren
+        /// Subtract
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public static Complex operator -(Complex a, Complex b)
         {
             return new Complex(a.Real - b.Real, a.Imaginary - b.Imaginary);
         }
 
+        /// <summary>
+        /// Subtract
+        /// </summary>
         public static Complex operator -(Complex comp, int value)
         {
             return new Complex(comp.Real - value, comp.Imaginary);
         }
 
+        /// <summary>
+        /// Subtract
+        /// </summary>
         public static Complex operator -(Complex comp, Fraction value)
         {
             return new Complex(comp.Real - value, comp.Imaginary);
@@ -220,27 +222,31 @@ namespace ToolBox.Algebra
 
         #region Overrides
 
+        /// <inheritdoc />
         public override string ToString()
         {
-            String result = "";
+            string result = string.Empty;
             if (Math.Abs(this.Real.Value) > 1e-13)
             {
                 result = this.Real.ToString();
                 if (this.Imaginary.Value > 1e-13)
+                {
                     result += "+";
+                }
             }
-            else
+            else if (Math.Abs(this.Imaginary.Value) < 1e-13)
             {
-                if (Math.Abs(this.Imaginary.Value) < 1e-13)
-                    result = "0";
+                result = "0";
             }
+
             if (Math.Abs(this.Imaginary.Value) < 1e-13)
             {
                 return result;
             }
-            if (!Fraction.Abs(this.Imaginary).Equals(new Fraction(1)))
+
+            if (!this.Imaginary.Absolute.Equals(new Fraction(1)))
             {
-                    result += this.Imaginary.ToString() + "i";
+                result += this.Imaginary.ToString() + "i";
             }
             else
             {
@@ -253,41 +259,30 @@ namespace ToolBox.Algebra
                     result += "-i";
                 }
             }
+
             return result;
-
-            //  if FReal <> 0.0 then begin
-            //    if frac(FReal) > 0 then Result := FloatToStr(FReal) else
-            //      Result := IntToStr(Trunc(FReal));
-            //    if FImaginary > 0 then Result := Result+'+';
-            //  end else if FImaginary = 0.0 then Result := '0';
-            //  if FImaginary <> 0.0 then begin
-            //    if abs(FImaginary) <> 1.0  then begin
-            //      if frac(FImaginary) > 0 then Result := Result+FloatToStr(FImaginary)+'j' else
-            //        Result := Result+IntToStr(Trunc(FImaginary))+'j';
-            //    end else if FImaginary > 0 then Result := Result+'j' else Result := Result+'-j';
-            //  end;
-
         }
 
-        public object Clone()
-        {
-            return new Complex(this);
-        }
+        /// <inheritdoc />
+        public object Clone() => new Complex(this);
 
         #endregion
 
         #region Equality
 
+        /// <inheritdoc />
         public bool Equals(Complex other)
         {
             return this.Real.Equals(other.Real) && this.Imaginary.Equals(other.Imaginary);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj is Complex other && Equals(other);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             unchecked

@@ -62,6 +62,16 @@ namespace TestProject
         #endregion
 
         [TestMethod]
+        public void TestAssignment()
+        {
+            Fraction a = new Fraction(5, 2);
+            Fraction b = a;
+
+            a += 1;
+            Assert.AreNotEqual(a, b);
+        }
+
+        [TestMethod]
         public void TestAdd()
         {
             Fraction a = new Fraction(1, 3);
@@ -127,9 +137,54 @@ namespace TestProject
         public void TestToString()
         {
             Fraction a = new Fraction(14, 15);
-            Console.WriteLine(a.ToString());
 
             Assert.AreEqual("14/15", a.ToString());
+        }
+
+        [TestMethod]
+        public void TestToStringFormat()
+        {
+            Fraction z = Fraction.Zero;
+
+            Assert.AreEqual("0", z.ToString("%W"), "%W");
+            Assert.AreEqual("0", z.ToString("%N%S%D"), "%N%S%D");
+            Assert.AreEqual("0", z.ToString("%W %N%S%D"), "%W %N%S%D");
+
+            Fraction a = new Fraction(14);
+
+            Assert.AreEqual("14", a.ToString("%W"), "%W");
+            Assert.AreEqual("14", a.ToString("%N%S%D"), "%N%S%D");
+            Assert.AreEqual("14", a.ToString("%W %N%S%D"), "%W %N%S%D");
+
+            Fraction b = new Fraction(3, 4);
+
+            Assert.AreEqual("0", b.ToString("%W"), "%W");
+            Assert.AreEqual("3/4", b.ToString("%N%S%D"), "%N%S%D");
+            Assert.AreEqual("3/4", b.ToString("%W %N%S%D"), "%W %N%S%D");
+
+            Fraction c = new Fraction(4, 3);
+
+            Assert.AreEqual("1", c.ToString("%W"), "%W");
+            Assert.AreEqual("4/3", c.ToString("%N%S%D"), "%N%S%D");
+            Assert.AreEqual("1 1/3", c.ToString("%W %N%S%D"), "%W %N%S%D");
+
+            Fraction d = new Fraction(4, 2);
+
+            Assert.AreEqual("2", d.ToString("%W"), "%W");
+            Assert.AreEqual("2", d.ToString("%N%S%D"), "%N%S%D");
+            Assert.AreEqual("2", d.ToString("%W %N%S%D"), "%W %N%S%D");
+
+            Fraction e = new Fraction(-1, 2);
+
+            Assert.AreEqual("0", e.ToString("%W"), "%W");
+            Assert.AreEqual("-1/2", e.ToString("%N%S%D"), "%N%S%D");
+            Assert.AreEqual("-1/2", e.ToString("%W %N%S%D"), "%W %N%S%D");
+
+            Fraction f = new Fraction(-3, 2);
+
+            Assert.AreEqual("-1", f.ToString("%W"), "%W");
+            Assert.AreEqual("-3/2", f.ToString("%N%S%D"), "%N%S%D");
+            Assert.AreEqual("-1 1/2", f.ToString("%W %N%S%D"), "%W %N%S%D");
         }
 
         [TestMethod]
@@ -158,9 +213,18 @@ namespace TestProject
         }
 
         [TestMethod]
+        public void TestSqrt()
+        {
+            Fraction a = new Fraction(1, 16);
+            Fraction expected = new Fraction(1, 4);
+
+            Assert.AreEqual(expected, a.Sqrt());
+        }
+
+        [TestMethod]
         public void TestCopy()
         {
-            Fraction a = new Fraction(5,8);
+            Fraction a = new Fraction(5, 8);
             Fraction b = new Fraction(a);
             //b.Denominator = 9;
             //b.Numerator = 6;
