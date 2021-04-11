@@ -79,7 +79,7 @@
     <Content Include="AuthoringTests.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ToolBox.csproj">
+    <ProjectReference Include="..\ToolBox\ToolBox.csproj">
       <Project>{A928AC84-38CA-488B-BF58-2CF29B0CB2CA}</Project>
       <Name>ToolBox</Name>
     </ProjectReference>
