@@ -1,5 +1,7 @@
 ﻿using ToolBox;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ToolBox.Algebra;
+
 namespace TestProject
 {
 

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ToolBox
+namespace ToolBox.Algebra
 {
     /// <summary>
     /// Bruch
@@ -150,7 +148,7 @@ namespace ToolBox
         /// </summary>
         public Fraction Inverse()
         {
-            return new Fraction(Denominator, Numerator);
+            return new Fraction(this.Denominator, this.Numerator);
         }
 
         public static Fraction MakeRational(double x, double eps)
@@ -432,7 +430,7 @@ namespace ToolBox
 
         public override bool Equals(object obj)
         {
-            return obj is Fraction other && Equals(other);
+            return obj is Fraction other && this.Equals(other);
         }
 
         #endregion

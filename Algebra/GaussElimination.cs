@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace ToolBox
+namespace ToolBox.Algebra
 {
     public static class GaussElimination
     {

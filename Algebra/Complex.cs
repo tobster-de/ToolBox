@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace ToolBox
+namespace ToolBox.Algebra
 {
     public class Complex : IEquatable<Complex>
     {
@@ -21,11 +20,11 @@ namespace ToolBox
         {
             get
             {
-                return m_Real;
+                return this.m_Real;
             }
             set
             {
-                m_Real = value;
+                this.m_Real = value;
             }
         }
 
@@ -36,11 +35,11 @@ namespace ToolBox
         {
             get
             {
-                return m_Imaginary;
+                return this.m_Imaginary;
             }
             set
             {
-                m_Imaginary = value;
+                this.m_Imaginary = value;
             }
         }
 
@@ -55,8 +54,8 @@ namespace ToolBox
         /// <param name="imag">Imaginärteil</param>
         public Complex(int real, int imag)
         {
-            m_Real = new Fraction(real);
-            m_Imaginary = new Fraction(imag);
+            this.m_Real = new Fraction(real);
+            this.m_Imaginary = new Fraction(imag);
         }
 
         /// <summary>
@@ -66,8 +65,8 @@ namespace ToolBox
         /// <param name="imag">Imaginärteil</param>
         public Complex(double real, double imag)
         {
-            m_Real = new Fraction(real);
-            m_Imaginary = new Fraction(imag);
+            this.m_Real = new Fraction(real);
+            this.m_Imaginary = new Fraction(imag);
         }
 
         /// <summary>
@@ -77,8 +76,8 @@ namespace ToolBox
         /// <param name="imag">Imaginärteil</param>
         public Complex(Fraction real, Fraction imag)
         {
-            m_Real = real != default ? real : throw new ArgumentNullException(nameof(real)); 
-            m_Imaginary = imag != default ? imag : throw new ArgumentNullException(nameof(imag));
+            this.m_Real = real != default ? real : throw new ArgumentNullException(nameof(real)); 
+            this.m_Imaginary = imag != default ? imag : throw new ArgumentNullException(nameof(imag));
         }
 
         /// <summary>
@@ -87,8 +86,8 @@ namespace ToolBox
         /// <param name="real">Realteil</param>
         public Complex(int real)
         {
-            m_Real = new Fraction(real);
-            m_Imaginary = new Fraction(0);
+            this.m_Real = new Fraction(real);
+            this.m_Imaginary = new Fraction(0);
         }
 
         /// <summary>
@@ -97,8 +96,8 @@ namespace ToolBox
         /// <param name="real">Realteil</param>
         public Complex(double real)
         {
-            m_Real = new Fraction(real);
-            m_Imaginary = new Fraction(0);
+            this.m_Real = new Fraction(real);
+            this.m_Imaginary = new Fraction(0);
         }
 
         /// <summary>
@@ -107,8 +106,8 @@ namespace ToolBox
         /// <param name="real">Realteil</param>
         public Complex(Fraction real)
         {
-            m_Real = real != default ? real : throw new ArgumentNullException(nameof(real));
-            m_Imaginary = new Fraction(0);
+            this.m_Real = real != default ? real : throw new ArgumentNullException(nameof(real));
+            this.m_Imaginary = new Fraction(0);
         }
 
         /// <summary>
@@ -117,8 +116,8 @@ namespace ToolBox
         /// <param name="original">Originalobjekt</param>
         public Complex(Complex original)
         {
-            m_Real = new Fraction(original.Real);
-            m_Imaginary = new Fraction(original.Imaginary);
+            this.m_Real = new Fraction(original.Real);
+            this.m_Imaginary = new Fraction(original.Imaginary);
         }
 
         #endregion
@@ -235,7 +234,7 @@ namespace ToolBox
         /// <returns></returns>
         public Complex Conjunction()
         {
-            return new Complex(m_Real, -m_Imaginary);
+            return new Complex(this.m_Real, -this.m_Imaginary);
         }
 
         /// <summary>
@@ -258,28 +257,28 @@ namespace ToolBox
         public override string ToString()
         {
             String result = "";
-            if (Math.Abs(m_Real.Value) > 1e-13)
+            if (Math.Abs(this.m_Real.Value) > 1e-13)
             {
-                result = m_Real.ToString();
-                if (m_Imaginary.Value > 1e-13)
+                result = this.m_Real.ToString();
+                if (this.m_Imaginary.Value > 1e-13)
                     result += "+";
             }
             else
             {
-                if (Math.Abs(m_Imaginary.Value) < 1e-13)
+                if (Math.Abs(this.m_Imaginary.Value) < 1e-13)
                     result = "0";
             }
-            if (Math.Abs(m_Imaginary.Value) < 1e-13)
+            if (Math.Abs(this.m_Imaginary.Value) < 1e-13)
             {
                 return result;
             }
-            if (!Fraction.Abs(m_Imaginary).Equals(new Fraction(1)))
+            if (!Fraction.Abs(this.m_Imaginary).Equals(new Fraction(1)))
             {
-                    result += m_Imaginary.ToString() + "i";
+                    result += this.m_Imaginary.ToString() + "i";
             }
             else
             {
-                if (m_Imaginary.Value > 0)
+                if (this.m_Imaginary.Value > 0)
                 {
                     result += "i";
                 }
@@ -338,7 +337,7 @@ namespace ToolBox
                 return false;
             }
 
-            return Equals((Complex) obj);
+            return this.Equals((Complex) obj);
         }
 
         public override int GetHashCode()
