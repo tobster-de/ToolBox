@@ -62,17 +62,32 @@ namespace TestProject
         #endregion
 
         /// <summary>
+        ///A test for Absolute value
+        ///</summary>
+        [TestMethod]
+        public void AbsoluteTest()
+        {
+            Complex target = new Complex(4, 3);
+            Fraction expected = new Fraction(5);
+
+            Assert.AreEqual(expected, target.Absolute);
+
+            target = new Complex(5, 4);
+            double expAbs = Math.Sqrt(5 * 5 + 4 * 4);
+
+            Assert.IsTrue(Math.Abs(expAbs- target.Absolute.Value) <= double.Epsilon);
+        }
+
+        /// <summary>
         ///A test for Real
         ///</summary>
         [TestMethod]
         public void RealTest()
         {
-            Complex target = new Complex(99);
-            Fraction expected = new Fraction(1); // TODO: Initialize to an appropriate value
-            target.Real = expected;
-            Fraction actual = target.Real;
-            Assert.AreEqual(expected, actual);
-            //Assert.Inconclusive("Verify the correctness of this test method.");
+            Fraction expected = new Fraction(99);
+            Complex target = new Complex(expected);
+
+            Assert.AreEqual(expected, target.Real);
         }
 
         /// <summary>
@@ -81,12 +96,10 @@ namespace TestProject
         [TestMethod]
         public void ImaginaryTest()
         {
-            Complex target = new Complex(99);
-            Fraction expected = new Fraction(6);
-            Fraction actual;
-            target.Imaginary = expected;
-            actual = target.Imaginary;
-            Assert.AreEqual(expected, actual);
+            Fraction expected = new Fraction(99);
+            Complex target = new Complex(2, expected);
+
+            Assert.AreEqual(expected, target.Imaginary);
         }
 
         /// <summary>
@@ -270,23 +283,22 @@ namespace TestProject
         }
 
         /// <summary>
-        ///A test for Conjunction
-        ///</summary>
+        /// A test for Conjugation
+        /// </summary>
         [TestMethod]
-        public void ConjunctionTest()
+        public void ConjugationTest()
         {
             Complex comp = new Complex(4, 6);
             Complex expected = new Complex(4, -6);
-            Complex actual;
-            actual = comp.Conjunction();
-            Assert.AreEqual(expected, actual);
+
+            Assert.AreEqual(expected, comp.Conjugation);
         }
 
         /// <summary>
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod]
-        public void ComplexConstructorTest_RealImagAsFraction()
+        public void ConstructorTest_RealImagAsFraction()
         {
             Fraction real = new Fraction(7);
             Fraction imag = new Fraction(3);
@@ -300,7 +312,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod, ExpectedException(typeof(ArgumentNullException))]
-        public void ComplexConstructorTest_RealImagAsFractionDefault()
+        public void ConstructorTest_RealImagAsFractionDefault()
         {
             Fraction real = default;
             Fraction imag = default;
@@ -311,7 +323,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod]
-        public void ComplexConstructorTest_RealImagAsDouble()
+        public void ConstructorTest_RealImagAsDouble()
         {
             double real = 8.0;
             double imag = 9.0;
@@ -325,7 +337,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod]
-        public void ComplexConstructorTest_RealImagAsDouble_Zero()
+        public void ConstructorTest_RealImagAsDouble_Zero()
         {
             double real = 0F;
             double imag = 0F;
@@ -339,7 +351,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod]
-        public void ComplexConstructorTest_RealImagAsInt()
+        public void ConstructorTest_RealImagAsInt()
         {
             int real = 6;
             int imag = 3;
@@ -352,7 +364,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod]
-        public void ComplexConstructorTest_RealImagAsInt_Zero()
+        public void ConstructorTest_RealImagAsInt_Zero()
         {
             int real = 0;
             int imag = 0;
@@ -365,7 +377,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod]
-        public void ComplexConstructorTest_RealAsInt()
+        public void ConstructorTest_RealAsInt()
         {
             int real = 8;
             Complex target = new Complex(real);
@@ -377,7 +389,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod]
-        public void ComplexConstructorTest_RealAsInt_Zero()
+        public void ConstructorTest_RealAsInt_Zero()
         {
             int real = 0;
             Complex target = new Complex(real);
@@ -389,7 +401,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod]
-        public void ComplexConstructorTest_Copy()
+        public void ConstructorTest_Copy()
         {
             int real = 6;
             int imag = 3;
@@ -405,7 +417,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod, ExpectedException(typeof(ArgumentNullException))]
-        public void ComplexConstructorTest_RealAsFractionDefault()
+        public void ConstructorTest_RealAsFractionDefault()
         {
             Fraction real = default;
             Complex target = new Complex(real);
@@ -415,7 +427,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod]
-        public void ComplexConstructorTest_RealAsFraction()
+        public void ConstructorTest_RealAsFraction()
         {
             Fraction real = new Fraction(8);
             Complex target = new Complex(real);
@@ -427,7 +439,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod]
-        public void ComplexConstructorTest_RealAsDouble()
+        public void ConstructorTest_RealAsDouble()
         {
             double real = 5.0;
             Complex target = new Complex(real);
@@ -440,7 +452,7 @@ namespace TestProject
         ///A test for Complex Constructor
         ///</summary>
         [TestMethod]
-        public void ComplexConstructorTest_RealAsDouble_Zero()
+        public void ConstructorTest_RealAsDouble_Zero()
         {
             double real = 0.0;
             Complex target = new Complex(real);

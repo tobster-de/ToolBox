@@ -392,14 +392,6 @@ namespace ToolBox.Algebra
 
         #region Overrides
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (this.Numerator.GetHashCode() * 397) ^ this.Denominator.GetHashCode();
-            }
-        }
-
         public object Clone()
         {
             return new Fraction(this);
@@ -431,6 +423,14 @@ namespace ToolBox.Algebra
         public override bool Equals(object obj)
         {
             return obj is Fraction other && this.Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (this.Numerator.GetHashCode() * 397) ^ this.Denominator.GetHashCode();
+            }
         }
 
         #endregion

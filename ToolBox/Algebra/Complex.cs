@@ -2,46 +2,39 @@
 
 namespace ToolBox.Algebra
 {
-    public class Complex : IEquatable<Complex>
+    public struct Complex : IEquatable<Complex>, ICloneable
     {
-        #region Fields
-
-        private Fraction m_Real;
-        private Fraction m_Imaginary;
-
-        #endregion
-
         #region Properties
 
         /// <summary>
         /// Realteil
         /// </summary>
-        public Fraction Real
-        {
-            get
-            {
-                return this.m_Real;
-            }
-            set
-            {
-                this.m_Real = value;
-            }
-        }
+        public Fraction Real { get; }
 
         /// <summary>
         /// Imaginärteil
         /// </summary>
-        public Fraction Imaginary
+        public Fraction Imaginary { get; }
+
+        /// <summary>
+        /// Gibt Absolutwert wieder
+        /// </summary>
+        /// <returns>Absolutwert</returns>
+        /// <remarks>Verlust der Präzision, </remarks>
+        public Fraction Absolute
         {
             get
             {
-                return this.m_Imaginary;
-            }
-            set
-            {
-                this.m_Imaginary = value;
+                //TODO: Wurzel eines Bruches implementieren
+                double abs = Math.Sqrt((this.Real * this.Real).Value + (this.Imaginary * this.Imaginary).Value);
+                return new Fraction(abs);
             }
         }
+
+        /// <summary>
+        /// Konjugiert komplexe Zahl
+        /// </summary>
+        public Complex Conjugation => new Complex(this.Real, -this.Imaginary);
 
         #endregion
 
@@ -54,8 +47,8 @@ namespace ToolBox.Algebra
         /// <param name="imag">Imaginärteil</param>
         public Complex(int real, int imag)
         {
-            this.m_Real = new Fraction(real);
-            this.m_Imaginary = new Fraction(imag);
+            this.Real = new Fraction(real);
+            this.Imaginary = new Fraction(imag);
         }
 
         /// <summary>
@@ -65,8 +58,8 @@ namespace ToolBox.Algebra
         /// <param name="imag">Imaginärteil</param>
         public Complex(double real, double imag)
         {
-            this.m_Real = new Fraction(real);
-            this.m_Imaginary = new Fraction(imag);
+            this.Real = new Fraction(real);
+            this.Imaginary = new Fraction(imag);
         }
 
         /// <summary>
@@ -76,8 +69,8 @@ namespace ToolBox.Algebra
         /// <param name="imag">Imaginärteil</param>
         public Complex(Fraction real, Fraction imag)
         {
-            this.m_Real = real != default ? real : throw new ArgumentNullException(nameof(real)); 
-            this.m_Imaginary = imag != default ? imag : throw new ArgumentNullException(nameof(imag));
+            this.Real = real != default ? real : throw new ArgumentNullException(nameof(real)); 
+            this.Imaginary = imag != default ? imag : throw new ArgumentNullException(nameof(imag));
         }
 
         /// <summary>
@@ -86,8 +79,8 @@ namespace ToolBox.Algebra
         /// <param name="real">Realteil</param>
         public Complex(int real)
         {
-            this.m_Real = new Fraction(real);
-            this.m_Imaginary = new Fraction(0);
+            this.Real = new Fraction(real);
+            this.Imaginary = new Fraction(0);
         }
 
         /// <summary>
@@ -96,8 +89,8 @@ namespace ToolBox.Algebra
         /// <param name="real">Realteil</param>
         public Complex(double real)
         {
-            this.m_Real = new Fraction(real);
-            this.m_Imaginary = new Fraction(0);
+            this.Real = new Fraction(real);
+            this.Imaginary = new Fraction(0);
         }
 
         /// <summary>
@@ -106,8 +99,8 @@ namespace ToolBox.Algebra
         /// <param name="real">Realteil</param>
         public Complex(Fraction real)
         {
-            this.m_Real = real != default ? real : throw new ArgumentNullException(nameof(real));
-            this.m_Imaginary = new Fraction(0);
+            this.Real = real != default ? real : throw new ArgumentNullException(nameof(real));
+            this.Imaginary = new Fraction(0);
         }
 
         /// <summary>
@@ -116,8 +109,8 @@ namespace ToolBox.Algebra
         /// <param name="original">Originalobjekt</param>
         public Complex(Complex original)
         {
-            this.m_Real = new Fraction(original.Real);
-            this.m_Imaginary = new Fraction(original.Imaginary);
+            this.Real = new Fraction(original.Real);
+            this.Imaginary = new Fraction(original.Imaginary);
         }
 
         #endregion
@@ -225,60 +218,33 @@ namespace ToolBox.Algebra
 
         #endregion
 
-        #region Public Implementation
-
-        /// <summary>
-        /// Konjugiert komplexe Zahl
-        /// </summary>
-        /// <param name="comp"></param>
-        /// <returns></returns>
-        public Complex Conjunction()
-        {
-            return new Complex(this.m_Real, -this.m_Imaginary);
-        }
-
-        /// <summary>
-        /// Gibt Absolutwert wieder
-        /// </summary>
-        /// <param name="comp">Komplexe Zahl</param>
-        /// <returns>Absolutwert</returns>
-        /// <remarks>Verlust der Präzision, </remarks>
-        public static Fraction Abs(Complex comp)
-        {
-            //TODO: Wurzel eines Bruches implementieren
-            double abs = Math.Sqrt((comp.Real * comp.Real).Value + (comp.Imaginary * comp.Imaginary).Value);
-            return new Fraction(abs);
-        }
-        
-        #endregion
-
         #region Overrides
 
         public override string ToString()
         {
             String result = "";
-            if (Math.Abs(this.m_Real.Value) > 1e-13)
+            if (Math.Abs(this.Real.Value) > 1e-13)
             {
-                result = this.m_Real.ToString();
-                if (this.m_Imaginary.Value > 1e-13)
+                result = this.Real.ToString();
+                if (this.Imaginary.Value > 1e-13)
                     result += "+";
             }
             else
             {
-                if (Math.Abs(this.m_Imaginary.Value) < 1e-13)
+                if (Math.Abs(this.Imaginary.Value) < 1e-13)
                     result = "0";
             }
-            if (Math.Abs(this.m_Imaginary.Value) < 1e-13)
+            if (Math.Abs(this.Imaginary.Value) < 1e-13)
             {
                 return result;
             }
-            if (!Fraction.Abs(this.m_Imaginary).Equals(new Fraction(1)))
+            if (!Fraction.Abs(this.Imaginary).Equals(new Fraction(1)))
             {
-                    result += this.m_Imaginary.ToString() + "i";
+                    result += this.Imaginary.ToString() + "i";
             }
             else
             {
-                if (this.m_Imaginary.Value > 0)
+                if (this.Imaginary.Value > 0)
                 {
                     result += "i";
                 }
@@ -303,49 +269,33 @@ namespace ToolBox.Algebra
 
         }
 
+        public object Clone()
+        {
+            return new Complex(this);
+        }
+
         #endregion
+
+        #region Equality
 
         public bool Equals(Complex other)
         {
-            if (ReferenceEquals(null, other))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-
-            return Equals(this.m_Real, other.m_Real) && Equals(this.m_Imaginary, other.m_Imaginary);
+            return this.Real.Equals(other.Real) && this.Imaginary.Equals(other.Imaginary);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            if (obj.GetType() != this.GetType())
-            {
-                return false;
-            }
-
-            return this.Equals((Complex) obj);
+            return obj is Complex other && Equals(other);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return ((this.m_Real != null ? this.m_Real.GetHashCode() : 0) * 397) ^ (this.m_Imaginary != null ? this.m_Imaginary.GetHashCode() : 0);
+                return (this.Real.GetHashCode() * 397) ^ this.Imaginary.GetHashCode();
             }
         }
+
+        #endregion
     }
 }
